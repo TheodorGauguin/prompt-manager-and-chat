@@ -3,14 +3,18 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  .dark body {
     @apply bg-base-950 text-base-50;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  body {
+    @apply bg-base-50 text-base-900;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 code {
