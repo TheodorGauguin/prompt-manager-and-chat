@@ -1,67 +1,32 @@
-<script>
-	import { browser } from '$app/environment';
-	import { page } from '$app/stores';
-	import { webVitals } from '$lib/vitals';
-	import Header from './Header.svelte';
-	import './styles.css';
-
-	/** @type {import('./$types').LayoutServerData} */
-	export let data;
-
-	$: if (browser && data?.analyticsId) {
-		webVitals({
-			path: $page.url.pathname,
-			params: $page.params,
-			analyticsId: data.analyticsId
-		});
-	}
+<script lang="ts">
+	import '../app.css';
+	import { Trash } from 'lucide-svelte';
 </script>
 
-<div class="app">
-	<Header />
-
-	<main>
+<div class="flex h-screen">
+	<div class="w-full max-w-xs rounded-2xl m-4 bg-gray-900 p-8">
+		<h1 class="text-muted-foreground mb-6">History</h1>
+		<button class="bg-gray-700 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+			<p class="flex-1">You are here</p>
+			<Trash class="w-4 h-4 hidden group-hover:block" />
+		</button>
+		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+			<p class="flex-1">You are here</p>
+			<Trash class="w-4 h-4 hidden group-hover:block" />
+		</button>
+		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+			<p class="flex-1">You are here</p>
+			<Trash class="w-4 h-4 hidden group-hover:block" />
+		</button>
+		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+			<p class="flex-1">You are here</p>
+			<Trash class="w-4 h-4 hidden group-hover:block" />
+		</button>
+	</div>
+	<div class="p-4 pl-0 flex-1">
 		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
+	</div>
 </div>
 
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
+<style lang="postcss">
 </style>
