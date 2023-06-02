@@ -13,11 +13,11 @@ export default {
     },
     extend: {
       colors: {
-        primary: colors.green,
-        secondary: colors.emerald,
-        contrast: colors.pink,
-        base: colors.zinc,        
-        "foreground-muted": colors.zinc[400],
+        primary: colors.violet,
+        secondary: colors.purple,
+        contrast: colors.emerald,
+        base: colors.stone,        
+        "foreground-muted": colors.stone[400],
       },
       fontFamily: {
         'handwritten': ['Bradley Hand'],
