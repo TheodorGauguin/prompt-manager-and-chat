@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Send, LogOut, Trash } from 'lucide-svelte';
+	import { Send, LogOut, Trash, Share } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { marked } from 'marked';
 	import { markedHighlight } from 'marked-highlight';
@@ -12,14 +12,14 @@
 			highlight(code, lang) {
 				const language = hljs.getLanguage(lang) ? lang : 'plaintext';
 				return hljs.highlight(code, { language }).value;
-			},
-		}),
+			}
+		})
 	);
 
 	marked.options({
 		mangle: false,
-		headerIds: false,
-	})
+		headerIds: false
+	});
 
 	type ChatMessage = {
 		message: string;
@@ -27,6 +27,69 @@
 	};
 
 	const messages: ChatMessage[] = [
+		{
+			message: 'This is a chat message 1 from the llm',
+			role: 'Assistant'
+		},
+		{
+			message:
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
+		{
+			message: `Test code block
+\`\`\`
+const highlight = "code";
+\`\`\`
+`,
+			role: 'Assistant'
+		},
+		{
+			message: 'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
+		{
+			message: 'This is a chat message 1 from the llm',
+			role: 'Assistant'
+		},
+		{
+			message:
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
+		{
+			message: `Test code block
+\`\`\`
+const highlight = "code";
+\`\`\`
+`,
+			role: 'Assistant'
+		},
+		{
+			message: 'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
+		{
+			message: 'This is a chat message 1 from the llm',
+			role: 'Assistant'
+		},
+		{
+			message:
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quislorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
+		{
+			message: `Test code block
+\`\`\`
+const highlight = "code";
+\`\`\`
+`,
+			role: 'Assistant'
+		},
+		{
+			message: 'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl quis',
+			role: 'User'
+		},
 		{
 			message: 'This is a chat message 1 from the llm',
 			role: 'Assistant'
@@ -56,6 +119,12 @@ const highlight = "code";
 		messages.splice(i + 1, messages.length - i);
 	};
 
+	const resizeToFit = (e: any) => {
+		const target = e.target;
+		target.style.height = 'auto';
+		target.style.height = target.scrollHeight + 'px';
+	};
+
 	const saveMessage = (message: string) => {
 		savedMessages.push(message);
 		savedMessages = savedMessages;
@@ -68,57 +137,91 @@ const highlight = "code";
 		document.addEventListener(`selectionchange`, () => {
 			selection = document.getSelection()?.toString() || '';
 		});
+		const allTextAreas = document.getElementsByTagName('textarea');
+		for (let i = 0; i < allTextAreas.length; i++) {
+			resizeToFit({ target: allTextAreas[i] });
+		}
 	});
 </script>
 
 <div class="flex h-full">
 	<div class="flex flex-col w-full h-full space-y-4">
-		<div class="flex-1 bg-gray-900 rounded-3xl flex flex-col p-8 space-y-2 overflow-auto">
+		<div class="rounded-full bg-base-800 w-full p-8 flex relative">
+			<div class="absolute inset-0 flex justify-center items-center">
+				<span class="text-xl">This Chat is a test Chat.</span>
+			</div>
+			<div class="absolute inset-y-0 right-0 flex items-center justify-center">
+				<button class="w-16 h-12 flex items-center justify-center"><Share class="w-6 h-6" /></button
+				>
+			</div>
+		</div>
+		<div class="flex-1 rounded-3xl flex flex-col px-8 space-y-4 overflow-auto">
 			{#each messages as { message, role }, i}
 				<div class="group flex items-center space-x-4">
 					{#if role == 'Assistant'}
-						<div class="rounded-xl p-4 bg-gray-800 w-fit">{@html marked(message)}</div>
+						<div class="flex flex-col w-full p-4 space-y-4">
+							<div class="flex justify-between">
+								<p class="text-contrast-600">{role}</p>
+								<button on:click={() => saveMessage(message)}>
+									<LogOut
+										class="w-4 h-4 cursor-pointer hidden group-hover:block"
+										on:click={() => saveMessage(message)}
+									/></button
+								>
+							</div>
+							<div>{@html marked(message)}</div>
+						</div>
 					{:else}
-						<textarea
-							class="w-full h-fit rounded-xl p-4 self-end bg-gray-600"
-							bind:value={messages[i].message}
-							on:input={() => removeFollowingMessages(i)}
-						/>
+						<div class="flex flex-col w-full p-4 space-y-4 rounded-xl bg-base-900">
+							<div class="flex justify-between">
+								<p class="text-primary-600 flex-grow">{role}</p>
+								<button on:click={() => saveMessage(message)}>
+									<LogOut
+										class="w-4 h-4 cursor-pointer hidden group-hover:block"
+										on:click={() => saveMessage(message)}
+									/></button
+								>
+							</div>
+							<textarea
+								class="w-full bg-base-900 resize-none"
+								bind:value={messages[i].message}
+								on:input={(e) => {
+									removeFollowingMessages(i);
+									resizeToFit(e);
+								}}
+							/>
+						</div>
 					{/if}
-					<button on:click={() => saveMessage(message)}>
-						<LogOut
-							class="w-4 h-4 cursor-pointer hidden group-hover:block"
-							on:click={() => saveMessage(message)}
-						/></button
-					>
 				</div>
 			{/each}
 		</div>
-		<div>
-			<div class="flex w-full rounded-full py-4 px-6 bg-gray-800 text-white items-center">
+		<div class="px-8">
+			<div class="flex w-full rounded-full ps-6 pe-2 bg-base-800 text-white items-center">
 				<input
 					type="text"
-					class="flex-1 outline-none bg-transparent text-white"
+					class="flex-1 outline-none bg-transparent text-white py-4"
 					placeholder="Type a message..."
 				/>
-				<Send class="w-6 h-6 cursor-pointer" />
+				<button class="bg-gradient-to-br from-primary-600 to-secondary-700 p-3 m-1 rounded-full"
+					><Send class="w-4 h-4" /></button
+				>
 			</div>
 		</div>
 	</div>
 
-	<div class="w-full max-w-sm rounded-2xl bg-gray-950 p-8">
-		<h1 class="text-muted-foreground mb-6">Notepad</h1>
+	<div class="w-full h-full overflow-auto max-w-sm rounded-2xl p-8 font-handwritten space-y-4">
+		<h1 class="text-foreground-muted mb-4">Notepad</h1>
 		{#each savedMessages as message, i}
-			<div class="bg-gray-800 rounded-xl p-4 mb-4 space-y-2 flex flex-col">
-				<p>{message}</p>
+			<div class="bg-base-950 flex flex-col group relative">
+				<p class="group-hover:blur-sm">{message}</p>
 				<button
-					class="border p-2 rounded-md self-end"
+					class="absolute w-full h-full hidden group-hover:flex items-center justify-center"
 					on:click={() => {
 						savedMessages.splice(i, 1);
 						savedMessages = savedMessages;
 					}}
 				>
-					<Trash class="h-4 w-4" />
+					<Trash class="h-8 w-8" />
 				</button>
 			</div>
 		{/each}

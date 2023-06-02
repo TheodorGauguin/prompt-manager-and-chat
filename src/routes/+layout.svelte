@@ -4,21 +4,21 @@
 </script>
 
 <div class="flex h-screen">
-	<div class="w-full max-w-xs rounded-2xl m-4 bg-gray-900 p-8">
-		<h1 class="text-muted-foreground mb-6">History</h1>
-		<button class="bg-gray-700 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+	<div class="w-full max-w-xs rounded-2xl m-4 bg-base-900 p-8">
+		<h1 class="text-foreground-muted mb-6">History</h1>
+		<button class="bg-gradient-135 from-primary-500 to-secondary-600 group w-full text-left p-4 pe-6 rounded-full flex items-center">
 			<p class="flex-1">You are here</p>
 			<Trash class="w-4 h-4 hidden group-hover:block" />
 		</button>
-		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+		<button class="bg-inherit hover:brightness-150 group w-full text-left p-4 pe-6 rounded-full flex items-center">
 			<p class="flex-1">You are here</p>
 			<Trash class="w-4 h-4 hidden group-hover:block" />
 		</button>
-		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+		<button class="bg-inherit hover:brightness-150 group w-full text-left p-4 pe-6 rounded-full flex items-center">
 			<p class="flex-1">You are here</p>
 			<Trash class="w-4 h-4 hidden group-hover:block" />
 		</button>
-		<button class="hover:bg-gray-800 group w-full text-left p-4 pe-6 rounded-full flex items-center">
+		<button class="bg-inherit hover:brightness-150 group w-full text-left p-4 pe-6 rounded-full flex items-center">
 			<p class="flex-1">You are here</p>
 			<Trash class="w-4 h-4 hidden group-hover:block" />
 		</button>
