@@ -9,7 +9,7 @@
 		padding: {
 			default: 'py-2 px-6',
 			'start-icon': 'ps-4',
-			'round-icon-button': 'p-2 w-auto aspect-square',
+			'round-icon-button': 'p-2 h-full aspect-square',
 			'end-icon': 'pe-4'
 		},
 		borderRadius: 'rounded-full',
