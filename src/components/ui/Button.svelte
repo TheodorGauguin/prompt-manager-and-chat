@@ -9,7 +9,7 @@
 		padding: {
 			default: 'py-2 px-6',
 			'start-icon': 'ps-4',
-			'round-icon-button': 'p-2',
+			'round-icon-button': 'p-2 w-auto aspect-square',
 			'end-icon': 'pe-4'
 		},
 		borderRadius: 'rounded-full',
@@ -95,12 +95,7 @@
 			}
 		},
 		active: {
-			bg: {
-				primary: 'active:bg-primary-500/40',
-				secondary: 'active:bg-secondary-500/40',
-				contrast: 'active:bg-contrast-500/40',
-				base: 'active:bg-base-500/40'
-			}
+      brightness: "active:brightness-75",
 		},
     focus: {
       outline: {
@@ -133,14 +128,9 @@
 				contrast: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
 				base: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
 			}
-		},		
-    active: {
-			bg: {
-				primary: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
-				secondary: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
-				contrast: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
-				base: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
-			}
+		},
+		active: {
+      brightness: "active:brightness-75",
 		},
     focus: {
       outline: {
@@ -169,12 +159,7 @@
 			}
 		},
 		active: {
-			bg: {
-				primary: 'active:bg-primary-500/20',
-				secondary: 'active:bg-secondary-500/20',
-				contrast: 'active:bg-contrast-500/20',
-				base: 'active:bg-base-500/20'
-			}
+      brightness: "active:brightness-75",
 		},
     focus: {
       outline: {
@@ -213,7 +198,7 @@
 			light.bg[color],
 			light.text[color],
 			light.hover.bg[color],
-      light.active.bg[color],
+      light.active.brightness,
       light.focus.outline[color],
 		],
 		outline: [
@@ -222,7 +207,7 @@
 			outline.outlineColor[color],
 			outline.text[color],
 			outline.hover.bg[color],
-      outline.active.bg[color],
+      outline.active.brightness,
       outline.focus.outline[color],
 		],
 		ghost: [
@@ -230,7 +215,7 @@
 			ghost.bg,
 			ghost.text[color],
 			ghost.hover.bg[color],
-      ghost.active.bg[color],
+      ghost.active.brightness,
       ghost.focus.outline[color],
 		]
 	};
