@@ -1,67 +1,250 @@
 <script lang="ts">
-	export let variant: 'default' | 'flat' | 'light' | 'outline' | 'ghost' = 'default';
+	export let variant: 'normal' | 'flat' | 'light' | 'outline' | 'ghost' = 'normal';
 	export let color: 'primary' | 'secondary' | 'contrast' | 'base' = 'primary';
 	export let disabled: boolean = false;
-  
-  /** DO NOT DELETE
-  list of all tailwind classes that are used. this is necessary to compose the class names without classes being purged
-  default:
-  from-primary-600 to-secondary-700
-  from-secondary-600 to-secondary-700
-  from-contrast-600 to-contrast-700
-  from-base-600 to-base-700
-  flat:
-  bg-primary-700
-  bg-secondary-700
-  bg-contrast-700
-  bg-base-700
-  light:
-  from-primary-500/20 to-primary-500/20 text-primary-400 text-primary-600 text-primary-300 dark:text-primary-400
-  from-secondary-500/20 to-secondary-500/20 text-secondary-400 text-secondary-600 text-secondary-300 dark:text-secondary-400
-  from-contrast-500/20 to-contrast-500/20 text-contrast-400 text-contrast-600 text-contrast-300 dark:text-contrast-400
-  from-base-500/20 to-base-500/20 text-base-300 text-base-400 text-base-500 text-base-600 text-base-700 
-  outline:
-  border border-1 border-primary-400 text-primary-400 hover:bg-primary-500/20 outline-primary-400
-  border border-1 border-secondary-400 text-secondary-400 hover:bg-secondary-500/20 outline-secondary-400
-  border border-1 border-contrast-400 text-contrast-400 hover:bg-contrast-500/20 outline-contrast-400
-  border border-1 border-base-400 text-base-400 hover:bg-base-500/20 outline-base-400 text-base-300
-  ghost:
-  text-primary-400 hover:bg-primary-500/20
-  text-secondary-400 hover:bg-secondary-500/20
-  text-contrast-400 hover:bg-contrast-500/20
-  text-base-400 hover:bg-base-500/20
-  */
 
-	const commonStyles =
-		`${$$slots["round-icon-button"] ? "p-2" : "py-2 px-6"} rounded-full flex items-center justify-center space-x-2 transition-all duration-200`;
+	// these objects are used to generate the classes for the buttons
+	// it CANNOT be optimized through string interpolation because tailwind purges these classes
+	const shared = {
+		padding: {
+			default: 'py-2 px-6',
+			'start-icon': 'ps-4',
+			'round-icon-button': 'p-2',
+			'end-icon': 'pe-4'
+		},
+		borderRadius: 'rounded-full',
+		transition: 'transition-bg duration-100',
+		flex: 'flex items-center justify-center',
+		space: 'space-x-2'
+	};
 
-	const defaultStyle = `${commonStyles} bg-gradient-135 from-${color}-600 to-${color == "primary" ? "secondary" : color}-700 hover:brightness-90 dark:hover:brightness-75 text-base-50`;
-  const flatStyle = `${commonStyles} bg-${color}-700 hover:brightness-90 dark:hover:brightness-75 text-base-50`;
-  const lightStyle = `${commonStyles} bg-gradient-135 from-${color}-500/20 to-${color == "primary" ? "secondary" : color}-500/20 text-${color}-600 dark:text-${color == "base" ? "base-300" : color + "-400"} hover:brightness-90 hover:dark:brightness-75`;
-  const outlineStyle = `${commonStyles} bg-transparent outline outline-1 -outline-offset-1 outline-base-300 dark:outline-base-700 text-${color == "base" ? "base-500" : color + "-400"} dark:text-${color == "base" ? "base-300" : color + "-400"} hover:bg-base-500/20`;
-  const ghostStyle = `${commonStyles} bg-transparent text-${color}-400 hover:bg-${color}-500/20`;
+	const normal = {
+		text: 'text-base-50',
+		bg: 'bg-gradient-135',
+		from: {
+			primary: 'from-primary-500',
+			secondary: 'from-secondary-500',
+			contrast: 'from-contrast-500',
+			base: 'from-base-500'
+		},
+		to: {
+			primary: 'to-secondary-800',
+			secondary: 'to-secondary-800',
+			contrast: 'to-contrast-800',
+			base: 'to-base-700'
+		},
+		hover: {
+			brightness: 'hover:brightness-110 dark:hover:brightness-110',
+		},
+    active: {
+      brightness: 'active:brightness-90 dark:active:brightness-90',
+    },
+    focus: {
+      outline: {
+        primary: 'focus-visible:outline-offset-2 focus-visible:outline-primary-700 focus-visible:dark:outline-primary-500',
+        secondary: 'focus-visible:outline-offset-2 focus-visible:outline-secondary-700 focus-visible:dark:outline-secondary-500',
+        contrast: 'focus-visible:outline-offset-2 focus-visible:outline-contrast-700 focus-visible:dark:outline-contrast-500',
+        base: 'focus-visible:outline-offset-2 focus-visible:outline-base-700 focus-visible:dark:outline-base-500',
+      },
+    }
+	};
 
-	const selectedStyle = new Map<string,string>([
-		["default", defaultStyle],
-		["flat", flatStyle],
-		["light", lightStyle],
-		["outline", outlineStyle],
-		["ghost", ghostStyle],
-  ]);
+	const flat = {
+		bg: {
+			primary: 'bg-primary-700',
+			secondary: 'bg-secondary-700',
+			contrast: 'bg-contrast-700',
+			base: 'bg-base-600'
+		},
+		text: 'text-base-50',
+		hover: {
+			brightness: 'hover:brightness-110 dark:hover:brightness-110',
+		},
+    active: {
+      brightness: 'active:brightness-90 dark:active:brightness-90',
+    },
+    focus: {
+      outline: {
+        primary: 'focus-visible:outline-offset-2 focus-visible:outline-primary-700 focus-visible:dark:outline-primary-500',
+        secondary: 'focus-visible:outline-offset-2 focus-visible:outline-secondary-700 focus-visible:dark:outline-secondary-500',
+        contrast: 'focus-visible:outline-offset-2 focus-visible:outline-contrast-700 focus-visible:dark:outline-contrast-500',
+        base: 'focus-visible:outline-offset-2 focus-visible:outline-base-700 focus-visible:dark:outline-base-500',
+      }
+    }
+	};
 
+	const light = {
+    bg: {
+      primary: 'bg-primary-500/20',
+      secondary: 'bg-secondary-500/20',
+      contrast: 'bg-contrast-500/20',
+      base: 'bg-base-500/20'
+    },
+		text: {
+			primary: 'text-primary-600 dark:text-primary-400',
+			secondary: 'text-secondary-600 dark:text-secondary-400',
+			contrast: 'text-contrast-600 dark:text-contrast-400',
+			base: 'text-base-600 dark:text-base-300',
+		},
+		hover: {
+			bg: {
+				primary: 'hover:bg-primary-500/40',
+				secondary: 'hover:bg-secondary-500/40',
+				contrast: 'hover:bg-contrast-500/40',
+				base: 'hover:bg-base-500/40'
+			}
+		},
+		active: {
+			bg: {
+				primary: 'active:bg-primary-500/40',
+				secondary: 'active:bg-secondary-500/40',
+				contrast: 'active:bg-contrast-500/40',
+				base: 'active:bg-base-500/40'
+			}
+		},
+    focus: {
+      outline: {
+        primary: 'focus-visible:outline-primary-700 focus-visible:dark:outline-primary-500',
+        secondary: 'focus-visible:outline-secondary-700 focus-visible:dark:outline-secondary-500',
+        contrast: 'focus-visible:outline-contrast-700 focus-visible:dark:outline-contrast-500',
+        base: 'focus-visible:outline-base-700 focus-visible:dark:outline-base-500',
+      }
+    }
+	};
+
+	const outline = {
+		outline: 'outline outline-1 -outline-offset-1',
+		outlineColor: {
+			primary: 'outline-base-300 dark:outline-base-500',
+			secondary: 'outline-base-300 dark:outline-base-500',
+			contrast: 'outline-base-300 dark:outline-base-500',
+			base: 'outline-base-300 dark:outline-base-500',
+		},
+		text: {
+			primary: 'text-primary-600 dark:text-primary-400',
+			secondary: 'text-secondary-600 dark:text-secondary-400',
+			contrast: 'text-contrast-600 dark:text-contrast-400',
+			base: 'text-base-600 dark:text-base-300',
+		},
+		hover: {
+			bg: {
+				primary: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
+				secondary: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
+				contrast: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
+				base: 'hover:bg-base-300/20 hover:dark:bg-base-500/20',
+			}
+		},		
+    active: {
+			bg: {
+				primary: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
+				secondary: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
+				contrast: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
+				base: 'active:bg-base-300/20 hover:dark:bg-base-500/20',
+			}
+		},
+    focus: {
+      outline: {
+        primary: 'focus-visible:outline-primary-700 focus-visible:dark:outline-primary-500',
+        secondary: 'focus-visible:outline-secondary-700 focus-visible:dark:outline-secondary-500',
+        contrast: 'focus-visible:outline-contrast-700 focus-visible:dark:outline-contrast-500',
+        base: 'focus-visible:outline-base-700 focus-visible:dark:outline-base-500',
+      }
+    }
+	};
+
+	const ghost = {
+		bg: 'bg-transparent',
+		text: {
+			primary: 'text-primary-600 dark:text-primary-400',
+			secondary: 'text-secondary-600 dark:text-secondary-400',
+			contrast: 'text-contrast-600 dark:text-contrast-400',
+			base: 'text-base-600 dark:text-base-300',
+		},
+		hover: {
+			bg: {
+				primary: 'hover:bg-primary-500/20',
+				secondary: 'hover:bg-secondary-500/20',
+				contrast: 'hover:bg-contrast-500/20',
+				base: 'hover:bg-base-500/20'
+			}
+		},
+		active: {
+			bg: {
+				primary: 'active:bg-primary-500/20',
+				secondary: 'active:bg-secondary-500/20',
+				contrast: 'active:bg-contrast-500/20',
+				base: 'active:bg-base-500/20'
+			}
+		},
+    focus: {
+      outline: {
+        primary: 'focus-visible:outline-primary-700 focus-visible:dark:outline-primary-500',
+        secondary: 'focus-visible:outline-secondary-700 focus-visible:dark:outline-secondary-500',
+        contrast: 'focus-visible:outline-contrast-700 focus-visible:dark:outline-contrast-500',
+        base: 'focus-visible:outline-base-700 focus-visible:dark:outline-base-500',
+      }
+    }
+	};
+
+	const sharedClasses = [
+		$$slots['round-icon-button'] ? shared.padding['round-icon-button'] : shared.padding['default'],
+		$$slots['start-icon'] ? shared.padding['start-icon'] : null,
+		$$slots['end-icon'] ? shared.padding['end-icon'] : null,
+		shared.borderRadius,
+		shared.flex,
+		shared.space,
+		shared.transition
+	];
+
+	const variantClasses = {
+		normal: [
+			...sharedClasses,
+			normal.bg,
+			normal.text,
+			normal.from[color],
+			normal.to[color],
+      normal.hover.brightness,
+      normal.active.brightness,
+      normal.focus.outline[color],
+		],
+		flat: [...sharedClasses, flat.text, flat.bg[color], flat.hover.brightness, flat.active.brightness, flat.focus.outline[color]],
+		light: [
+			...sharedClasses,
+			light.bg[color],
+			light.text[color],
+			light.hover.bg[color],
+      light.active.bg[color],
+      light.focus.outline[color],
+		],
+		outline: [
+			...sharedClasses,
+			outline.outline,
+			outline.outlineColor[color],
+			outline.text[color],
+			outline.hover.bg[color],
+      outline.active.bg[color],
+      outline.focus.outline[color],
+		],
+		ghost: [
+			...sharedClasses,
+			ghost.bg,
+			ghost.text[color],
+			ghost.hover.bg[color],
+      ghost.active.bg[color],
+      ghost.focus.outline[color],
+		]
+	};
 </script>
 
 <button
 	{disabled}
-	class="{selectedStyle.get(variant)} {$$props.class || ''}"
-	class:ps-4={$$slots['start-icon']}
-	class:pe-4={$$slots['end-icon']}
+	class="{variantClasses[variant].join(' ')} {$$props.class || ''}"
 	class:opacity-50={disabled}
 	class:pointer-events-none={disabled}
 >
 	<slot name="start-icon" />
 	<p class="flex items-center justify-center">
-    <slot name="round-icon-button" />
+		<slot name="round-icon-button" />
 		<slot />
 	</p>
 	<slot name="end-icon" />

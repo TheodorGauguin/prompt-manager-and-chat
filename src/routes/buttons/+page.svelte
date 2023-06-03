@@ -3,7 +3,6 @@
 import Button from './../../components/ui/Button.svelte';
 </script>
 
-
 <h1 class="text-4xl mt-12 mb-6 text-bold">No icons</h1>
 <div class="flex space-x-4 items-center">
 	<p>Default:</p>
