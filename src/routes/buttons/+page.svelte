@@ -1,6 +1,6 @@
 <script>
 	import { Plus, PlusCircle, Send, Share } from 'lucide-svelte';
-import Button from './../../components/ui/Button.svelte';
+import Button from '../../components/ui/buttons/Button.svelte';
 </script>
 
 <h1 class="text-4xl mt-12 mb-6 text-bold">No icons</h1>
@@ -99,10 +99,4 @@ import Button from './../../components/ui/Button.svelte';
   <Button variant="outline" color="base">Button</Button>
   <p>Ghost:</p>
   <Button variant="ghost" color="base">Button</Button>
-</div>
-
-<div class="flex justify-center items-center">
-
-<Button color="primary">Test</Button>
-<Button variant="outline" color="base">Test</Button>
 </div>

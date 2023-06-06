@@ -12,6 +12,7 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
+		"@iconify/svelte": "^3.1.4",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
 		"@types/marked": "^5.0.0",
@@ -35,6 +36,7 @@
 	"dependencies": {
 		"@bytemd/plugin-gfm": "^1.21.0",
 		"@bytemd/plugin-highlight": "^1.21.0",
+		"@iconify/icons-ph": "^1.2.4",
 		"bytemd": "^1.21.0",
 		"highlight.js": "^11.8.0",
 		"lucide-svelte": "^0.233.0",
