@@ -14,7 +14,12 @@
 }
 
 :root {
+  @apply font-sans;
   color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
 }
 
 code {
