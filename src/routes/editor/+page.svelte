@@ -1,16 +1,57 @@
 <script lang="ts">
 	let innerHtml = '';
-  let editor: HTMLDivElement;
+	let editor: HTMLDivElement;
+	let previousKeyCombination = '';
+
+	const replaceElementWith = (
+		triggeringNode: HTMLElement,
+		newNodeType: string,
+		keyCombinationLength: number
+	) => {
+		// change the node to a newNodeType
+		const newElement = document.createElement(newNodeType);
+		if (triggeringNode.innerHTML.slice(keyCombinationLength) !== '') {
+			console.log(
+				'triggeringNode.innerHTML.slice(keyCombinationLength)',
+				triggeringNode.innerHTML.slice(keyCombinationLength)
+			);
+			newElement.innerHTML = triggeringNode.innerHTML.slice(keyCombinationLength);
+		} else {
+			const lineBreak = document.createElement('br');
+			newElement.appendChild(lineBreak);
+		}
+		newElement.id = triggeringNode.id;
+		triggeringNode.replaceWith(newElement);
+	};
+
+	const elementTransformShortcuts = [
+		{
+			keyCombination: '#',
+			newNodeType: 'h1'
+		},
+		{
+			keyCombination: '##',
+			newNodeType: 'h2'
+		},
+		{
+			keyCombination: '###',
+			newNodeType: 'h3'
+		},
+    {
+      keyCombination: '-', 
+      newNodeType: 'li'
+    }
+	];
 
 	let textBlocks = [
 		{
-			id: "1",
+			id: '1',
 			type: 'h1',
 			content: 'This is your Document',
 			order: 0
 		},
 		{
-			id: "2",
+			id: '2',
 			type: 'p',
 			content: 'Start typing here...',
 			order: 1
@@ -18,112 +59,69 @@
 	];
 
 	const onKeyPress = (e: KeyboardEvent) => {
-		if (e.key === '*') {
-      // if nothing is selected, return
-      const sel = window.getSelection();
-      console.log(sel)
-      if (!sel || sel.anchorOffset === sel.focusOffset || editor.contains(sel.anchorNode) === false) {
-        console.log('no selection or selection not inside editor')
+		const potentialMatch = elementTransformShortcuts.find((shortcut) =>
+			shortcut.keyCombination.startsWith(previousKeyCombination) || shortcut.keyCombination.startsWith(e.key)
+		);
+		if (potentialMatch && e.key === ' ') {
+			// if type is already the same, do nothing
+			const sel = window.getSelection();
+			if (sel?.anchorNode?.parentElement?.nodeName.toLowerCase() === potentialMatch.newNodeType) {
         return;
-      };
-      e.preventDefault();
-      // warp the selected text in an <em> tag, without using the deprecated execCommand
-      const range = sel?.getRangeAt(0);
-
-      console.log(range)
-
-      if (range.startContainer.nodeName == "EM" && range.endContainer.nodeName == "EM" && range.startContainer == range.endContainer) {
-        console.log('already wrapped in em. unwrapping...')
-        // remove wrapping em and all spans inside of selection
-        const em = range.startContainer;
-        const text = em.textContent;
-        const parent = em.parentNode;
-        if (!parent) return;
-        if (!text) return;
-        const textNode = document.createTextNode(text);
-        parent.insertBefore(textNode, range.startContainer);
-        parent.removeChild(em);
-        // unwrap all spans inside of selection (if any)
-        /*const spans = parent.querySelectorAll('span');
-        spans.forEach(span => {
-          const text = span.textContent;
-          if (!text) return;
-          const textNode = document.createTextNode(text);
-          parent.insertBefore(textNode, span);
-          parent.removeChild(span);
-        })*/
-        range.setStart(textNode, 0);
-        range.setEnd(textNode, text.length);
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-        return;
-      }
-
-      // if the parent of the selection is an em but the startContainer and endContainer are text, wrap the text in a span
-      if (range.startContainer.nodeName == "#text" && range.endContainer.nodeName == "#text" && range.startContainer.parentNode?.nodeName == "EM" && range.endContainer.parentNode?.nodeName == "EM") {
-        console.log('selection is inside an em. escaping with a span...')
-        // end the em tag at the start of the selection and start a new one at the end of the selection
-        const em = range.startContainer.parentNode;
-        const parentText = em.textContent;
-        const parent = em.parentNode;
-        if (!em || !parentText || !parent) return;
-        // take the text before the selection and wrap it in an em
-        const textBefore = parentText.substring(0, range.startOffset);
-        const textBeforeNode = document.createTextNode(textBefore);
-        const emBefore = document.createElement('em');
-        emBefore.appendChild(textBeforeNode);
-        parent.insertBefore(emBefore, em);
-        // take the text after the selection and wrap it in an em
-        const textAfter = parentText.substring(range.endOffset);
-        const textAfterNode = document.createTextNode(textAfter);
-        const emAfter = document.createElement('em');
-        emAfter.appendChild(textAfterNode);
-        console.log(range.endContainer)
-        console.log(range.endContainer.nextSibling)
-        parent.insertBefore(emAfter, em.nextSibling);
-        // insert selection as text node in between the two ems
-        const text = sel?.toString() || '';
-        const textNode = document.createTextNode(text);
-        parent.insertBefore(textNode, emAfter);
-        // remove the original em
-        parent.removeChild(em);
-      range?.selectNodeContents(textNode);
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-        return;
-      }
-
-      const em = document.createElement('em');
-      em.innerText = sel?.toString() || '';
-      range?.deleteContents();
-      range?.insertNode(em);
-      range?.selectNodeContents(em);
-      sel?.removeAllRanges();
-      sel?.addRange(range);
+			}
+			e.preventDefault();
+			const range = sel?.getRangeAt(0);
+			if (!range) return;
+			// if the cursor is at the beginning of the textblock and the target is a direct child of the editor
+      console.log(range.startOffset == potentialMatch.keyCombination.length)
+			if (
+				range.startOffset == potentialMatch.keyCombination.length &&
+				range.startContainer.parentElement?.parentElement == editor
+			) {
+				if (!sel?.anchorNode?.parentElement) return;
+				replaceElementWith(
+					sel?.anchorNode?.parentElement,
+					potentialMatch.newNodeType,
+					potentialMatch.keyCombination.length
+				);
+			}
+			previousKeyCombination = '';
+			return;
+		}
+		if (potentialMatch) {
+			previousKeyCombination += e.key;
+      console.log("potentialMatch", potentialMatch)
+		} else {
+			previousKeyCombination = '';
 		}
 	};
 
-  const onInput = (e: any)  => {
-    // check if there are any children that has a duplicate id
-    // if so, give it a new id
-    const children = e.target.children;
-    const ids: string[] = [];
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      if (ids.includes(child.id)) {
-        child.id = Math.round(Math.random() * 100000000).toString();
-      }
-      ids.push(child.id);
-    }
-  }
+	const onInput = (e: any) => {
+		// check if there are any children that has a duplicate id
+		// if so, give it a new id
+		const children = e.target.children;
+		const ids: string[] = [];
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			if (ids.includes(child.id) || child.id === '') {
+				child.id = Math.round(Math.random() * 100000000).toString();
+			}
+			ids.push(child.id);
+		}
+	};
 </script>
 
 <div class="p-6">
-  <span>tset</span>
+	<span>tset</span>
 	<p class="title" contenteditable="true">This is your Document</p>
-	<div contenteditable="true" id="editor" on:keypress={(e) => onKeyPress(e)} bind:this={editor} on:input={onInput}>
+	<div
+		contenteditable="true"
+		id="editor"
+		on:keypress={(e) => onKeyPress(e)}
+		bind:this={editor}
+		on:input={onInput}
+	>
 		{#each textBlocks as block}
-			<svelte:element id="{block.id}" this={block.type}>{block.content}</svelte:element>
+			<svelte:element this={block.type} id={block.id}>{block.content}</svelte:element>
 		{/each}
 	</div>
 </div>
@@ -132,7 +130,7 @@
 	.title {
 		@apply text-4xl font-black;
 	}
-	h1 {
+	#editor :global(h1) {
 		@apply text-4xl font-bold mt-8 mb-1 relative opacity-80;
 		& + div {
 			@apply mt-4;
@@ -146,7 +144,7 @@
 			left: -1.5rem;
 		}
 	}
-	h2 {
+	#editor :global(h2) {
 		@apply text-2xl font-semibold mt-4 mb-1 relative opacity-70;
 		&::before {
 			content: 'h2';
@@ -157,25 +155,27 @@
 			left: -1.5rem;
 		}
 	}
-	ul {
+	#editor :global(ul) {
 		@apply list-disc list-inside;
 	}
 
-	strong {
+	#editor :global(b) {
 		&::before,
 		&::after {
 			content: '**';
 			font-weight: 200;
-			opacity: 0.5;
+			opacity: 0.4;
+			letter-spacing: -1px;
 		}
 	}
 
-	em {
+	#editor :global(i) {
 		&::before,
 		&::after {
 			content: '*';
 			font-weight: 200;
-			opacity: 0.5;
+			opacity: 0.4;
+			letter-spacing: -1px;
 		}
 	}
 
@@ -196,7 +196,4 @@
 			}
 		}
 	}
-  span {
-    font-style: normal;
-  }
 </style>
