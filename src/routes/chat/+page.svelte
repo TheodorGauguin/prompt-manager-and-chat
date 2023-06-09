@@ -137,10 +137,6 @@ const highlight = "code";
 		document.addEventListener(`selectionchange`, () => {
 			selection = document.getSelection()?.toString() || '';
 		});
-		const allTextAreas = document.getElementsByTagName('textarea');
-		for (let i = 0; i < allTextAreas.length; i++) {
-			resizeToFit({ target: allTextAreas[i] });
-		}
 	});
 </script>
 
@@ -182,12 +178,12 @@ const highlight = "code";
 									/></button
 								>
 							</div>
-							<textarea
+							<div
+								contenteditable="true"
 								class="w-full bg-base-900 resize-none"
-								bind:value={messages[i].message}
-								on:input={(e) => {
+								bind:innerText={messages[i].message}
+								on:input={() => {
 									removeFollowingMessages(i);
-									resizeToFit(e);
 								}}
 							/>
 						</div>
