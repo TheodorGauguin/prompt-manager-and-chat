@@ -133,7 +133,6 @@
 </script>
 
 <div class="p-6">
-	<span>tset</span>
 	<p class="title" contenteditable="true">This is your Document</p>
 	<div
 		contenteditable="true"
