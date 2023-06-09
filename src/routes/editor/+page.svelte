@@ -11,10 +11,6 @@
 		// change the node to a newNodeType
 		const newElement = document.createElement(newNodeType);
 		if (triggeringNode.innerHTML.slice(keyCombinationLength) !== '') {
-			console.log(
-				'triggeringNode.innerHTML.slice(keyCombinationLength)',
-				triggeringNode.innerHTML.slice(keyCombinationLength)
-			);
 			newElement.innerHTML = triggeringNode.innerHTML.slice(keyCombinationLength);
 		} else {
 			const lineBreak = document.createElement('br');
@@ -22,6 +18,13 @@
 		}
 		newElement.id = triggeringNode.id;
 		triggeringNode.replaceWith(newElement);
+    // set the cursor inside the new element
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.setStart(newElement, 0);
+    range.collapse(true);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
 	};
 
 	const elementTransformShortcuts = [
@@ -37,63 +40,82 @@
 			keyCombination: '###',
 			newNodeType: 'h3'
 		},
-    {
-      keyCombination: '-', 
-      newNodeType: 'li'
-    }
+		{
+			keyCombination: '-',
+			newNodeType: 'li'
+		}
 	];
 
 	let textBlocks = [
 		{
-			id: '1',
-			type: 'h1',
-			content: 'This is your Document',
-			order: 0
-		},
-		{
-			id: '2',
-			type: 'p',
+			id: Math.round(Math.random() * 1000000).toString(),
+			type: 'div',
 			content: 'Start typing here...',
-			order: 1
+			order: 0
 		}
 	];
 
 	const onKeyPress = (e: KeyboardEvent) => {
-		const potentialMatch = elementTransformShortcuts.find((shortcut) =>
-			shortcut.keyCombination.startsWith(previousKeyCombination) || shortcut.keyCombination.startsWith(e.key)
-		);
-		if (potentialMatch && e.key === ' ') {
-			// if type is already the same, do nothing
-			const sel = window.getSelection();
-			if (sel?.anchorNode?.parentElement?.nodeName.toLowerCase() === potentialMatch.newNodeType) {
-        return;
+		if (e.key === ' ') {
+			const match = elementTransformShortcuts.find(
+				(shortcut) => shortcut.keyCombination == previousKeyCombination
+			);
+			if (match) {
+				// if type is already the same, do nothing
+				const sel = window.getSelection();
+				if (sel?.anchorNode?.parentElement?.nodeName.toLowerCase() === match.newNodeType) {
+					return;
+				}
+				e.preventDefault();
+				const range = sel?.getRangeAt(0);
+				if (!range) return;
+				// if the cursor is at the beginning of the textblock and the target is a direct child of the editor
+				if (
+					range.startOffset == match.keyCombination.length &&
+					range.startContainer.parentElement?.parentElement == editor
+				) {
+					if (!sel?.anchorNode?.parentElement) return;
+					replaceElementWith(
+						sel?.anchorNode?.parentElement,
+						match.newNodeType,
+						match.keyCombination.length
+					);
+				}
+				previousKeyCombination = '';
+				return;
 			}
-			e.preventDefault();
-			const range = sel?.getRangeAt(0);
-			if (!range) return;
-			// if the cursor is at the beginning of the textblock and the target is a direct child of the editor
-      console.log(range.startOffset == potentialMatch.keyCombination.length)
-			if (
-				range.startOffset == potentialMatch.keyCombination.length &&
-				range.startContainer.parentElement?.parentElement == editor
-			) {
-				if (!sel?.anchorNode?.parentElement) return;
-				replaceElementWith(
-					sel?.anchorNode?.parentElement,
-					potentialMatch.newNodeType,
-					potentialMatch.keyCombination.length
+		} else {
+			let potentialMatch;
+			if (previousKeyCombination !== '') {
+				potentialMatch = elementTransformShortcuts.find((shortcut) =>
+					shortcut.keyCombination.startsWith(previousKeyCombination)
+				);
+			} else {
+				potentialMatch = elementTransformShortcuts.find((shortcut) =>
+					shortcut.keyCombination.startsWith(e.key)
 				);
 			}
-			previousKeyCombination = '';
-			return;
-		}
-		if (potentialMatch) {
-			previousKeyCombination += e.key;
-      console.log("potentialMatch", potentialMatch)
-		} else {
-			previousKeyCombination = '';
+			if (potentialMatch) {
+				previousKeyCombination += e.key;
+			} else {
+				previousKeyCombination = '';
+			}
 		}
 	};
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Backspace") {
+      const sel = window.getSelection();
+      if (!sel || !sel?.anchorNode?.parentElement) return;
+      const range = sel.getRangeAt(0);
+      if (!range) return;
+      if (sel.anchorOffset === 0 && editor.contains(sel.anchorNode) && sel.anchorNode.nodeName.toLowerCase() !== "div") {
+        e.preventDefault();
+        // convert to div
+        replaceElementWith(sel.anchorNode as HTMLElement, "div", 0)
+      }
+    }
+  }
 
 	const onInput = (e: any) => {
 		// check if there are any children that has a duplicate id
@@ -117,6 +139,7 @@
 		contenteditable="true"
 		id="editor"
 		on:keypress={(e) => onKeyPress(e)}
+    on:keydown={(e) => onKeyDown(e)}
 		bind:this={editor}
 		on:input={onInput}
 	>
